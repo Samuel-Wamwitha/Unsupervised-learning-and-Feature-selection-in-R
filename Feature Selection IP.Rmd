@@ -1,0 +1,906 @@
+---
+title: "Feature Selection IP"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Defining the Question?
+## Specifying the Question
+You are a Data analyst at Carrefour Kenya and are currently undertaking a project that will inform the marketing department on the most relevant marketing strategies that will result in the highest no. of sales (total price including tax)
+
+Perform Feature Selection.
+
+## Defining the metrics of success
+Perform data cleaning, Exploratory data analysis and Feature Selection effectively in R
+
+## Understanding the Context
+Feature selection helps selection select the important features in a dataset. This helps businesses know which features to put more importance on and how they affect their businesses. Feature selection also help reduce features needed for analysis.
+
+## Recording the Experimental Design
+ - Reading the Data
+ - Checking the Data
+ - Tidying the Data
+ - Exploratory Data Analysis
+ - Performing Feature Selection
+
+## Data Relevance
+The dataset provided was relevant for the objective we set for our project.
+
+
+
+# Reading the Dataset
+```{r}
+# Loading the Dataset
+sup = read.csv('Supermarket_Dataset_1 - Sales Data.csv')
+```
+
+
+
+# Checking the Dataset
+```{r}
+# Checking the shape of the dataset
+dim(sup)
+```
+The dataset contains 1000 rows and 10 columns.
+
+
+```{r}
+# Previewing the top of the Dataset
+head(sup)
+```
+
+
+```{r}
+# Previewing the bottom of the Dataset
+tail(sup)
+```
+
+
+```{r}
+# Checking the Datatypes of the columns
+str(sup)
+```
+The dataset contains 1 column of datatype integer, 7 columns of datatype num and 8 columns of datatype character.
+
+
+```{r}
+# Checking unique values of Branch
+unique(sup$Branch)
+```
+
+```{r}
+# Checking unique Customer type
+unique(sup$Customer.type)
+```
+
+```{r}
+# Checking unique values of Product line
+unique(sup$Product.line)
+```
+
+```{r}
+# Checking unique values of Payment
+unique(sup$Payment)
+```
+
+
+
+```{r}
+# Checking for Duplicates
+anyDuplicated(sup)
+```
+There were no duplicates in our dataset.
+
+
+
+# Tidying the Dataset
+## Missing values
+```{r}
+# Checking for missing values
+colSums(is.na(sup))
+```
+
+
+## Outliers
+```{r}
+# Checking for Outliers in Unit price column
+boxplot(sup$Unit.price)
+```
+
+
+```{r}
+# Checking for Outliers in Quantity column
+boxplot(sup$Quantity)
+```
+
+
+```{r}
+# Checking for Outliers in Tax column
+boxplot(sup$Tax)
+```
+
+
+```{r}
+# Checking for Outliers in Cogs column
+boxplot(sup$cogs)
+```
+
+
+```{r}
+# Checking for Outliers in Gross margin percentage column
+boxplot(sup$gross.margin.percentage)
+```
+
+
+```{r}
+# Checking for Outliers in Gross income column
+boxplot(sup$gross.income)
+```
+
+
+```{r}
+# Checking for Outliers in Rating column
+boxplot(sup$Rating)
+```
+
+
+```{r}
+# Checking for Outliers in Total column
+boxplot(sup$Total)
+```
+
+
+```{r}
+# Checking the list of Outliers in Tax column
+boxplot.stats(sup$Tax)$out
+```
+
+
+```{r}
+# Checking the list of Outliers in Cogs column
+boxplot.stats(sup$cogs)$out
+```
+
+
+```{r}
+# Checking the list of Outliers in Total column
+boxplot.stats(sup$Total)$out
+```
+Most columns have 9 Outliers
+The Outliers in the various columns were not removed because there were few and could not have any effect on the analysis.
+
+
+
+# Exploratory Data Analysis
+## Univariate Analysis
+### Counts
+```{r}
+# Checking the counts of Branch 
+library(plyr)
+count(sup$Branch)
+```
+
+
+```{r}
+# Checking the counts of Customer type
+count(sup$Customer.type)
+```
+
+
+```{r}
+# Checking the counts of Gender
+count(sup$Gender)
+```
+
+
+```{r}
+# Checking the counts of Product line
+count(sup$Product.line)
+```
+
+
+```{r}
+# Checking the counts of Payment
+count(sup$Payment)
+```
+
+
+### Mean
+```{r}
+mean(sup$Unit.price)
+```
+
+
+```{r}
+mean(sup$Quantity)
+```
+
+
+```{r}
+mean(sup$Tax)
+```
+
+
+```{r}
+mean(sup$cogs)
+```
+
+
+```{r}
+mean(sup$gross.income)
+```
+
+
+```{r}
+mean(sup$Rating)
+```
+
+
+```{r}
+mean(sup$Total)
+```
+
+
+### Median
+```{r}
+median(sup$Unit.price)
+```
+
+
+```{r}
+median(sup$Quantity)
+```
+
+
+```{r}
+median(sup$Tax)
+```
+
+
+```{r}
+median(sup$cogs)
+```
+
+
+```{r}
+median(sup$gross.income)
+```
+
+
+```{r}
+median(sup$Rating)
+```
+
+
+```{r}
+median(sup$Total)
+```
+
+
+### Maximum
+```{r}
+max(sup$Unit.price)
+```
+
+
+```{r}
+max(sup$Quantity)
+```
+
+
+```{r}
+max(sup$Tax)
+```
+
+
+```{r}
+max(sup$cogs)
+```
+
+
+```{r}
+max(sup$gross.income)
+```
+
+
+```{r}
+max(sup$Rating)
+```
+
+
+```{r}
+max(sup$Total)
+```
+
+
+### Minimum
+```{r}
+min(sup$Unit.price)
+```
+
+
+```{r}
+min(sup$Quantity)
+```
+
+
+```{r}
+min(sup$Tax)
+```
+
+
+```{r}
+min(sup$cogs)
+```
+
+
+```{r}
+min(sup$gross.income)
+```
+
+
+```{r}
+min(sup$Rating)
+```
+
+
+```{r}
+min(sup$Total)
+```
+
+
+### Range
+```{r}
+range(sup$Unit.price)
+```
+
+
+```{r}
+range(sup$Quantity)
+```
+
+
+```{r}
+range(sup$Tax)
+```
+
+
+```{r}
+range(sup$cogs)
+```
+
+
+```{r}
+range(sup$gross.income)
+```
+
+
+```{r}
+range(sup$Rating)
+```
+
+
+```{r}
+range(sup$Total)
+```
+
+
+### Quantile
+```{r}
+quantile(sup$Unit.price)
+```
+
+
+```{r}
+quantile(sup$Quantity)
+```
+
+
+```{r}
+quantile(sup$Tax)
+```
+
+
+```{r}
+quantile(sup$cogs)
+```
+
+
+```{r}
+quantile(sup$gross.income)
+```
+
+
+```{r}
+quantile(sup$Rating)
+```
+
+
+```{r}
+quantile(sup$Total)
+```
+
+
+### Interquantile Range
+```{r}
+IQR(sup$Unit.price)
+```
+
+
+```{r}
+IQR(sup$Quantity)
+```
+
+
+```{r}
+IQR(sup$Tax)
+```
+
+
+```{r}
+IQR(sup$cogs)
+```
+
+
+```{r}
+IQR(sup$gross.income)
+```
+
+
+```{r}
+IQR(sup$Rating)
+```
+
+
+```{r}
+IQR(sup$Total)
+```
+
+
+### Variance
+```{r}
+var(sup$Unit.price)
+```
+
+
+```{r}
+var(sup$Quantity)
+```
+
+
+```{r}
+var(sup$Tax)
+```
+
+
+```{r}
+var(sup$cogs)
+```
+
+
+```{r}
+var(sup$gross.income)
+```
+
+
+```{r}
+var(sup$Rating)
+```
+
+
+```{r}
+var(sup$Total)
+```
+
+
+### Standard Deviation
+```{r}
+sd(sup$Unit.price)
+```
+
+
+```{r}
+sd(sup$Quantity)
+```
+
+
+```{r}
+sd(sup$Tax)
+```
+
+
+```{r}
+sd(sup$cogs)
+```
+
+
+```{r}
+sd(sup$gross.income)
+```
+
+
+```{r}
+sd(sup$Rating)
+```
+
+
+```{r}
+sd(sup$Total)
+```
+
+
+### Skewness
+```{r}
+library(e1071)
+skewness(sup$Unit.price)
+```
+
+
+```{r}
+skewness(sup$Quantity)
+```
+
+
+```{r}
+skewness(sup$Tax)
+```
+
+
+```{r}
+skewness(sup$cogs)
+```
+
+
+```{r}
+skewness(sup$gross.income)
+```
+
+
+```{r}
+skewness(sup$Rating)
+```
+
+
+```{r}
+skewness(sup$Total)
+```
+
+
+### Kurtosis
+```{r}
+kurtosis(sup$Unit.price)
+```
+
+
+```{r}
+kurtosis(sup$Quantity)
+```
+
+
+```{r}
+kurtosis(sup$Tax)
+```
+
+
+```{r}
+kurtosis(sup$cogs)
+```
+
+
+```{r}
+kurtosis(sup$gross.income)
+```
+
+
+```{r}
+kurtosis(sup$Rating)
+```
+
+
+```{r}
+kurtosis(sup$Total)
+```
+
+
+### Plots
+```{r}
+# 
+barplot(table(sup$Branch),
+main = "Bargraph of Branches",
+xlab = "Branch",
+ylab = "Freq",
+col = cm.colors(4),
+horiz = FALSE)
+```
+
+
+```{r}
+# 
+barplot(table(sup$Customer.type),
+main = "Bargraph of Customer type",
+xlab = "Customer type",
+ylab = "Freq",
+col = cm.colors(2),
+horiz = FALSE)
+```
+
+
+```{r}
+# 
+barplot(table(sup$Gender),
+main = "Bargraph of Gender",
+xlab = "Gender",
+ylab = "Freq",
+col = topo.colors(2),
+horiz = FALSE)
+```
+
+
+
+```{r}
+# 
+barplot(table(sup$Product.line),
+main = "Bargraph of Product line",
+xlab = "Product line",
+ylab = "Freq",
+col = heat.colors(6),
+horiz = FALSE)
+```
+
+
+```{r}
+# 
+barplot(table(sup$Payment),
+main = "Bargraph of Payment",
+xlab = "Payment",
+ylab = "Freq",
+col = heat.colors(3),
+horiz = FALSE)
+```
+
+
+
+### Histograms
+```{r}
+hist(sup$Unit.price)
+```
+
+
+```{r}
+hist(sup$Quantity)
+```
+
+
+```{r}
+hist(sup$Tax)
+```
+
+
+```{r}
+hist(sup$cogs)
+```
+
+
+```{r}
+hist(sup$gross.income)
+```
+
+
+```{r}
+hist(sup$Rating)
+```
+
+
+```{r}
+hist(sup$Total)
+```
+
+
+## Bivariate Analysis
+### Plots
+```{r}
+library(ggplot2)
+ggplot(data=sup, aes(x=Quantity, y=Unit.price)) +
+geom_bar(stat="identity")
+```
+
+
+```{r}
+library(ggplot2)
+ggplot(data=sup, aes(x=Quantity, y=Rating)) +
+geom_bar(stat="identity")
+```
+
+
+```{r}
+# Creating a Dataframe with numeric variables only
+sup1 = sup[, c(6,7,8,12,14:16)]
+
+head(sup1)
+```
+
+
+### Covariance
+```{r}
+# Finding the covariance of the feature variables
+cov(sup1)
+```
+
+
+### Correlation
+```{r}
+# Finding the correlation coefficients of feature variables 
+cor(sup1)
+```
+
+
+### Correlation Matrix
+```{r}
+# Creating a correlation matrix
+library('corrplot')
+
+corrplot(cor(sup1), order = "hclust")
+```
+
+
+### Scatter Plots
+```{r}
+# Plotting a scatterplot between Cogs and Quantity
+plot(sup$cogs, sup$Quantity, xlab="Cogs", ylab="Quantity")
+```
+
+
+```{r}
+# Plotting a scatterplot between Tax and Unit price
+plot(sup$Tax, sup$Unit.price, xlab="Tax", ylab="Unit price")
+```
+
+
+```{r}
+# Plotting a scatterplot between Rating and Gross income
+plot(sup$Rating, sup$gross.income, xlab="Rating", ylab="Gross income")
+```
+
+
+```{r}
+# Plotting a scatterplot between Rating and Total
+plot(sup$Rating, sup$Total, xlab="Rating", ylab="Total")
+```
+
+
+### Observations
+ - The branch with the most customers was Branch A.
+ - Most customers were members and others normal customers.
+ - Most customers were females compared to males.
+ - Fashion accessories were the most bought products.
+ - Most customers payed using Ewallets.
+ - Most customers bought 1 - 2 items per sale.
+ - Most items had taxes ranging from 0 - 15.
+ - Most items had cogs between 0 - 200.
+ - Most customers rated 4.
+ - Tax, Cogs, and Total are highly correlated according to the correlation matrix.
+
+
+
+# Implementing the Solution
+## Feature Selection
+### Filter Method
+```{r}
+# Creating a numeric only dataset
+sp = sup[, c(6,7,8,12,14:16)]
+head(sp)
+
+```
+
+
+```{r}
+# Loading the required libraries
+#
+library(caret)
+library(corrplot)
+
+# Getting the correlations of the variables.
+#
+correlationMatrix <- cor(sp)
+```
+
+
+```{r}
+# Find attributes that are highly correlated
+#
+hc <- findCorrelation(correlationMatrix, cutoff=0.75)
+
+# Showing the highly correlated attributes
+#
+names(sp[,hc])
+```
+
+
+```{r}
+# Removing Redundant Features
+# 
+sp2<-sp[-hc]
+
+# Performing our graphical comparison
+# 
+par(mfrow = c(1, 2))
+corrplot(correlationMatrix, order = "hclust")
+corrplot(cor(sp2), order = "hclust")
+```
+
+
+### Embedded Method
+```{r}
+# Loading the required library
+#
+library(wskm)
+
+# Creating a model
+#
+set.seed(2)
+model <- ewkm(sp, 3, lambda=2, maxiter=1000)
+```
+
+
+```{r}
+# Loading the required library
+#
+library("cluster")
+
+# Cluster Plot against 1st and 2nd principal components
+#
+clusplot(sp, model$cluster, color=TRUE, shade=TRUE, labels=3, lines=1, main='Cluster Analysis for Sales')
+
+```
+
+
+```{r}
+# Getting the weights in percentages
+round(model$weights*100,2)
+```
+
+
+### Wrapper Method
+```{r}
+# Loading the required libraries
+#
+library(clustvarsel)
+library(mclust)
+
+# Performing sequential forward headlong search
+#
+out = clustvarsel(sp, G = 1:5, search = c("headlong"))
+out
+
+```
+
+
+```{r}
+# Building the clustering model
+#
+sp_sub = sp[,out$subset]
+mod = Mclust(sp_sub, G = 1:5)
+summary(mod)
+
+```
+
+
+```{r}
+# Plotting the model
+#
+plot(mod,c("classification"))
+
+```
+
+
+## Observations
+ - From Filter method we can see that tax, cogs, and total are highly correlated and therefore should be removed.
+ - From the Wrapper method tax and gross income are selected to be added and the other variables rejected.
+ 
+
+# Recommendations
+From the analysis the following recommendations can be made the filter method is the best to use for feature selection since it removes features which are highly correlated. Tax and gross income are the best feature to consider in our dataset when doing analysis. 
+

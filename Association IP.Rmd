@@ -1,0 +1,246 @@
+---
+title: "Association Analysis IP"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Defining the Question?
+## Specifying the Question
+You are a Data analyst at Carrefour Kenya and are currently undertaking a project that will inform the marketing department on the most relevant marketing strategies that will result in the highest no. of sales (total price including tax)
+
+Perform Associative analysis.
+
+## Defining the metrics of success
+Perform data cleaning, Exploratory data analysis and Associative analysis effectively in R
+
+## Understanding the Context
+Companies require association rules to identify relationships between items in the in sales. Associative analysis is used to find associations between the items that were purchased and as a result derive association rules that identify the items and co-occurrences of different items that appear with the greatest frequencies.
+
+## Recording the Experimental Design
+ - Reading the Data
+ - Checking the Data
+ - Tidying the Data
+ - Exploratory Data Analysis
+ - Performing Associative analysis
+
+## Data Relevance
+The dataset provided was relevant for the objective we set for our project.
+
+
+
+# Reading the Dataset
+```{r}
+# Loading the Dataset
+sales = read.csv('Supermarket_Sales_Dataset II.csv')
+```
+
+
+
+# Checking the Dataset
+```{r}
+# Checking the shape of the dataset
+dim(sales)
+```
+The dataset contains 7500 rows and 20 columns.
+
+
+```{r}
+# Previewing the top of the Dataset
+head(sales)
+```
+
+
+```{r}
+# Previewing the bottom of the Dataset
+tail(sales)
+```
+
+
+```{r}
+# Checking the Datatypes of the columns
+str(sales)
+```
+The dataset contains 19 columns of datatype character and 1 column of datatype logical.
+
+
+```{r}
+# Checking for Duplicates
+anyDuplicated(sales)
+```
+There were 34 duplicates in our dataset.
+
+
+```{r}
+# Dropping the duplicates in the dataset
+sales = unique(sales)
+```
+
+
+# Tidying the Dataset
+## Missing values
+```{r}
+# Checking for missing values
+colSums(is.na(sales))
+```
+
+```{r}
+# Omitting the column of the null values
+sales = sales[, -20]
+head(sales)
+```
+
+
+
+# Implementing the Solution
+## Association Rules
+```{r}
+# Loading the arules library
+library(arules)
+```
+
+
+```{r}
+# Converting our dataset to class transaction.
+sls<-read.transactions('Supermarket_Sales_Dataset II.csv')
+sls
+```
+
+
+```{r}
+# Verifying the class of our dataframe
+class(sls)
+```
+
+
+```{r}
+# Previewing the first 5 transactions of our datasets
+#
+inspect(sls[1:5])
+```
+
+
+```{r}
+# Another method of previewing our dataset
+# 
+items<-as.data.frame(itemLabels(sls))
+colnames(items) <- "Item"
+head(items, 10)    
+```
+
+
+```{r}
+# Getting the summary of our transactions in the dataset.
+# 
+summary(sls)
+```
+
+
+```{r}
+# Exploring the frequency of some articles 
+# 
+itemFrequency(sls[, 8:10],type = "absolute")
+round(itemFrequency(sls[, 8:10],type = "relative")*100,2)
+```
+
+
+```{r}
+# 
+par(mfrow = c(1, 2))
+
+# plotting the frequency of items
+itemFrequencyPlot(sls, topN = 10,col="darkgreen")
+
+# Plotting items whose relative importance is at least 10% 
+itemFrequencyPlot(sls, support = 0.1,col="darkred")
+```
+
+
+```{r}
+# Building a apriori model with Min Support as 0.001 and confidence as 0.8
+# 
+rls <- apriori (sls, parameter = list(supp = 0.001, conf = 0.8))
+
+rls
+
+```
+
+
+```{r}
+# Getting the summary of the rules created
+# 
+summary(rls)
+```
+
+
+```{r}
+# Observing rules built in our model
+# 
+inspect(rls[1:5])
+
+```
+
+
+```{r}
+# Ordering these rules by a lift criteria
+# 
+rls<-sort(rls, by="lift", decreasing=TRUE)
+inspect(rls[1:5])
+
+```
+
+
+```{r}
+# Ordering these rules by a support criteria
+rls<-sort(rls, by="support", decreasing=TRUE)
+inspect(rls[1:5])
+```
+
+
+```{r}
+# Ordering these rules by a confidence criteria
+rls<-sort(rls, by="confidence", decreasing=TRUE)
+inspect(rls[1:5])
+```
+
+
+## Observations
+ - The most frequent items are tea, wheat, mineral, fat, and yogurt.
+ - The model gives 271 set of rules.
+ - The rules have to 4 items per subsets.
+ - For every cookies and low someone buys there is a 100% chance they will buy yogurt and fat.
+
+
+# Challenging the Solution
+The solution can be challenged by building an apriori model with different support and confidence. This tends to reduce the number of rules.
+```{r}
+# Building a apriori model with Min Support as 0.002 and confidence as 0.6.
+#
+rls2 <- apriori (sls, parameter = list(supp = 0.002, conf = 0.6)) 
+
+rls2
+
+```
+
+
+```{r}
+# Getting the summary of the rules created
+# 
+summary(rls2)
+```
+
+
+```{r}
+# Observing rules built in our model
+# 
+inspect(rls2[1:5])
+
+```
+
+
+
+# Recommendations
+From the analysis the following recommendation can be made, the supermarket should stock more tea, wheat, mineral, fat, and yogurt since they are the most frequent items sold.
+

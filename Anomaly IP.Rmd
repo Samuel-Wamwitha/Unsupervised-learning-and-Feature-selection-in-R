@@ -1,0 +1,287 @@
+---
+title: "Anomaly Detection IP"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Defining the Question?
+## Specifying the Question
+You are a Data analyst at Carrefour Kenya and are currently undertaking a project that will inform the marketing department on the most relevant marketing strategies that will result in the highest no. of sales (total price including tax)
+
+Perform Anomaly detection on the sales dataset
+
+## Defining the metrics of success
+Perform data cleaning, Exploratory data analysis and Anomaly detection effectively in R
+
+## Understanding the Context
+Anomaly detection is collection of techniques designed to identify unusual data points. It helps identify unexpected data points in datasets.There are many applications of anomaly detections such as fraud and intrusion detection, system health monitoring and ecosystem disturbance monitoring. In our case we will be using anomaly detection to detect fraud.
+
+## Recording the Experimental Design
+ - Reading the Data
+ - Checking the Data
+ - Tidying the Data
+ - Exploratory Data Analysis
+ - Perform Anomaly Detection
+
+## Data Relevance
+The dataset provided was relevant for the objective we set for our project.
+
+
+
+# Reading the Dataset
+```{r}
+# Loading the Dataset
+sf = read.csv('Supermarket_Sales_Forecasting - Sales.csv')
+
+```
+
+
+
+# Checking the Dataset
+```{r}
+# Checking the shape of the dataset
+dim(sf)
+
+```
+The dataset contains 1000 rows and 2 columns.
+
+
+```{r}
+# Checking the class of our dataset
+class(sf)
+
+```
+
+
+
+```{r}
+# Previewing the top of the Dataset
+head(sf)
+
+```
+
+
+```{r}
+# Previewing the bottom of the Dataset
+tail(sf)
+
+```
+
+
+```{r}
+# Checking the Datatypes of the columns
+str(sf)
+
+```
+The dataset contains 1 column of datatype num and 1 column of datatype character
+
+
+```{r}
+# Checking for Duplicates
+anyDuplicated(sf)
+
+```
+There were no duplicates in our dataset.
+
+
+
+# Tidying the Dataset
+## Missing values
+```{r}
+# Checking for missing values
+colSums(is.na(sf))
+
+```
+
+
+## Outliers
+```{r}
+# Checking for Outliers in the sales column
+boxplot(sf$Sales)
+
+```
+
+
+```{r}
+# Checking the list of Outliers in the Sales column
+boxplot.stats(sf$Sales)$out
+
+```
+There are 9 Outliers in the Sales column.
+The Outliers in the column was removed because they had little effect on the data.
+
+
+
+# Exploratory Data Analysis
+### Mean
+```{r}
+mean(sf$Sales)
+
+```
+
+
+### Median
+```{r}
+median(sf$Sales)
+
+```
+
+
+### Maximum
+```{r}
+max(sf$Sales)
+
+```
+
+
+### Minimum
+```{r}
+min(sf$Sales)
+
+```
+
+
+### Range
+```{r}
+range(sf$Sales)
+
+```
+
+
+### Quantile
+```{r}
+quantile(sf$Sales)
+
+```
+
+
+### Interquantile Range
+```{r}
+IQR(sf$Sales)
+
+```
+
+
+### Variance
+```{r}
+var(sf$Sales)
+
+```
+
+
+### Standard Deviation
+```{r}
+sd(sf$Sales)
+
+```
+
+
+### Skewness
+```{r}
+library(e1071)
+skewness(sf$Sales)
+
+```
+
+
+### Kurtosis
+```{r}
+kurtosis(sf$Sales)
+
+```
+
+
+### Histogram
+```{r}
+# Plotting the histogram of sales
+hist(sf$Sales)
+
+```
+
+
+```{r}
+# Plotting barplot of Dates 
+barplot(table(sf$Date),
+main = "Bargraph of Dates",
+xlab = "Weekend",
+ylab = "Freq",
+col = topo.colors(5),
+horiz = FALSE)
+
+```
+
+### Observations
+ - Most sales ranged from 100 - 400
+ - Maximum sale was 1042.65
+ - Minimum sale was 10.6785
+ - The mean sales were 322.9667
+
+# Implementing the Solution
+## Anomaly Detection
+```{r}
+# Load tidyverse and anomalize libraries
+# 
+library(tidyverse)
+library(anomalize)
+
+```
+
+
+```{r}
+# Checking the datatype of Date column
+class(sf$Date)
+
+```
+
+
+```{r}
+# Changing the Date column from character to date format
+library(lubridate)
+sf$Date <- as.Date(sf$Date, format="%m/%d/%Y")
+
+```
+
+
+```{r}
+# Ordering the dataframe according to the dates
+sf1 <- sf[order(sf$Date),]
+
+```
+
+```{r}
+# Previewing the new dataframe
+head(sf1)
+
+```
+
+
+```{r}
+# Checking the datatype of Date column
+class(sf1$Date)
+
+```
+
+
+```{r}
+# Changing the dataset from dataframe format to tibble
+sf_tbl = as_tibble(sf1)
+head(sf_tbl)
+
+```
+
+
+```{r}
+# Detecting the anomalies and plotting them.
+sf_tbl %>%
+  group_by(Date) %>%
+  summarise(Sales = sum(Sales)) %>%
+  time_decompose(Sales) %>%
+  anomalize(remainder) %>%
+  time_recompose() %>%
+  plot_anomalies(time_recomposed = TRUE, ncol = 3, alpha_dots = 0.5)
+
+```
+There were no anomalies detected from the sales throughout the period the sales were recorded. Since there were no anomalies fraud did not take place in the sales.
